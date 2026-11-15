@@ -54,6 +54,48 @@ relevance and technical dependencies.
 When none applies, investigate and provide findings and next steps without
 implying that a documented fix exists.
 
+### Workflow
+
+```mermaid
+flowchart TD
+    start([Request or symptom]) --> evidence[Collect evidence: framework, NIXL artifact, platform, symptoms]
+    evidence --> route{Which use cases apply?}
+    route -->|Framework needs NIXL or cannot load it| uc1[UC1: Framework-supported NIXL]
+    route -->|Specific version or custom build| uc2[UC2: Chosen or custom artifact]
+    route -->|Transfers fail, are slow, or path unverified| uc3[UC3: Transfer-path diagnosis]
+    route -->|AWS EFA needs LIBFABRIC| uc4[UC4: LIBFABRIC on AWS EFA]
+    route -->|A routing fact is missing| ask[/Ask the user/]
+    ask --> route
+    route -->|None applies| generic[Investigate without a documented fix]
+    uc1 --> work
+    uc2 --> work
+    uc3 --> work
+    uc4 --> work
+    subgraph work [Shared workflow, per use case]
+        investigate[Investigate] --> attribute[Attribute: NIXL, integration, host, or unknown]
+        attribute --> fix[Fix when authorized, ask before privileged changes]
+        fix --> verify[Verify on the target]
+    end
+    verify --> related{Findings point to a related use case not yet handled?}
+    related -->|Yes| route
+    related -->|No| remaining{Selected use cases left?}
+    remaining -->|Yes| work
+    remaining -->|No| report([One report: findings, attribution, changes, verification, unresolved items, next steps])
+    generic --> report
+```
+
+### Related use cases
+
+After each use case, check whether its findings select another one:
+
+- **UC1 to UC2:** the framework-supported package cannot meet the requirement, such as a needed version or backend.
+- **UC1 or UC2 to UC3:** NIXL loads, but transfers fail, are slow, or use an unexpected backend.
+- **UC3 to UC4:** the deployment runs on AWS EFA and should use LIBFABRIC.
+- **UC3 to UC1 or UC2:** the required backend is missing from the installed artifact.
+- **UC4 to UC2:** the NIXL artifact lacks LIBFABRIC.
+
+Handle installation (UC1 or UC2) before transfer paths (UC3 or UC4) when both apply.
+
 ### Shared workflow
 
 Process every selected use case in the chosen order. Findings from one use case
