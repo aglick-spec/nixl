@@ -35,12 +35,14 @@ cannot be determined another way.
 
 ### Supported use cases
 
-1. **[Framework-supported NIXL](references/integration-install.md)** — Use when
+1. **[Framework-supported NIXL](references/integration-install-cases.md)** — Use when
    a framework deployment needs NIXL installed, or cannot load or use its
-   supported NIXL package.
-2. **[Chosen or custom NIXL artifact](references/custom-artifact.md)** — Use
+   supported NIXL package. Fixes are in
+   [references/integration-install-fixes.md](references/integration-install-fixes.md).
+2. **[Chosen or custom NIXL artifact](references/custom-artifact-cases.md)** — Use
    when the deployment needs a specific NIXL version or custom build instead of
-   the framework-supported package.
+   the framework-supported package. Fixes are in
+   [references/custom-artifact-fixes.md](references/custom-artifact-fixes.md).
 3. **[Transfer-path diagnosis](references/transfer-path.md)** — Use when
    transfers fail, perform unexpectedly slowly, or require verification of the
    backend, transport, or link being used.
@@ -78,9 +80,7 @@ flowchart TD
     end
     verify --> related{Findings point to a related use case not yet handled?}
     related -->|Yes| route
-    related -->|No| remaining{Selected use cases left?}
-    remaining -->|Yes| work
-    remaining -->|No| report([One report: findings, attribution, changes, verification, unresolved items, next steps])
+    related -->|No| report([One report: findings, attribution, changes, verification, unresolved items, next steps])
     generic --> report
 ```
 
@@ -107,8 +107,10 @@ may inform the others.
    Continue meaningful independent checks when another check fails, and stop
    only when further investigation would not change the attribution or remedy.
 2. **Attribute.** Attribute findings to NIXL, the integrating software, the host
-   environment, or unknown. Distinguish observed evidence from inference and
-   unconfirmed hypotheses.
+   environment, or unknown. The host is the driver, kernel, OS packages,
+   firmware, and hardware. Images, templates, deployment configuration,
+   launchers, and Python environments belong to the integrating software.
+   Distinguish observed evidence from inference and unconfirmed hypotheses.
 3. **Fix when authorized.** Follow the user's requested mode and authorization.
    Reversible userspace and integration changes within scope may proceed
    without further interruption. Ask before privileged, stack-changing, or
